@@ -139,8 +139,8 @@ const createClientAction = (fillingFormDate: User) => {
     method: "POST",
     url: apiPath,
     data: {
-      age: formDate.value.age,
-      name: formDate.value.name,
+      age: fillingFormDate.age,
+      name: fillingFormDate.name,
     }
   }).then( res => {
     const { data } = res.data;
@@ -160,9 +160,9 @@ const editClientAction = (fillingFormDate: User) => {
     method: "PUT",
     url: apiPath,
     data: {
-      id: formDate.value.id,
-      age: formDate.value.age,
-      name: formDate.value.name,
+      id: fillingFormDate.id,
+      age: fillingFormDate.age,
+      name: fillingFormDate.name,
     }
   }).then( (res) => {
     const { data } = res.data;
@@ -178,7 +178,22 @@ const editClientAction = (fillingFormDate: User) => {
     console.log(err);
   });
 };
-const removeClientAction = () => {};
+const removeClientAction = (fillingFormDate: User) => {
+  axios({
+    method: "DELETE",
+    url: apiPath,
+    data: {
+      id: fillingFormDate.id,
+    }
+  }).then( (res) => {
+      const index = searchingItemById(fillingFormDate);
+      console.log(res);
+      users.value.splice(index, 1);
+  }).catch( (err) => {
+    alert("請求失敗！");
+    console.log(err);
+  });
+};
 
 // CRUD module: Confirmation submodule
 const create = () => {
@@ -225,9 +240,8 @@ const remove = (user: User) => {
       formDate.value,
       "確定刪除嗎？"
     );
-    confirm.then( (req) => {
-      console.log(req);
-      removeClientAction();
+    confirm.then( () => {
+      removeClientAction(formDate.value);
     }).catch( actionCanceled );
     return;
   } else {
