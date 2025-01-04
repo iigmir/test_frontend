@@ -1,16 +1,17 @@
 <template>
   <div>
     <label
-      :for="element_id"
       class="form-label"
+      :for="element_id"
     >
       {{ props.label }}
     </label>
     <input
-      :type="input_type"
       class="form-control"
-      :id="element_id"
       placeholder="輸入..."
+      :id="element_id"
+      :type="input_type"
+      :value="props.modelValue"
       @input="emit_model"
     />
   </div>
@@ -21,16 +22,22 @@ import { ref, computed } from "vue";
 import { get_uuid } from "../assets/utils";
 
 // Props & emits module
-const props = defineProps({
-  label: String,
-  type: String,
+/**
+ * Why we use such a scrawl: 
+ * [Type-only props/emit declarations](https://vuejs.org/api/sfc-script-setup.html#type-only-props-emit-declarations)
+ */
+const props = defineProps<{
+  label: string,
+  type: string,
   /**
    * We don't really know what will sent from parents, so...
    */
-  modelValue: [Boolean, Array, Number, String],
-});
+  modelValue: [Boolean, Number, String],
+}>();
+/**
+ * @see: [Component v-model](https://vuejs.org/guide/components/v-model)
+ */
 const emits = defineEmits([
-  // https://vuejs.org/guide/components/v-model
   "update:modelValue"
 ]);
 /**
@@ -56,7 +63,9 @@ const emit_model = (e: Event) => {
       default: return source_value;
     }
   };
-  // Just let parent components decide how to deal with it
+  /**
+   * Just let parent components decide how to deal with them
+   */
   const emitted_value: any = get_emitted_value(source_value, input_type.value);
   emits("update:modelValue", emitted_value);
 };
@@ -72,8 +81,6 @@ const generate_uuid_id = (input = "") => {
 };
 uuid_id.value = generate_uuid_id( get_uuid() );
 const element_id = computed( () => `label-${uuid_id.value}` );
-
-// Value rendering module
 </script>
 
 <style lang="scss" scoped>
