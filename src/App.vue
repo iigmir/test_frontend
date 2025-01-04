@@ -56,8 +56,8 @@
 </template>
 
 <script setup lang="ts">
-import axios from 'axios'
-import {onMounted, ref} from 'vue';
+import axios from "axios";
+import { onMounted, ref } from "vue";
 import BFormControls from "./components/BFormControls.vue";
 
 interface User {
@@ -66,22 +66,89 @@ interface User {
   age: number;
 }
 
-const baseUrl = 'https://oks96yif.wuc.us.kg' // 由面試官提供
-const users = ref<User[]>([])
+// 由面試官提供
+const baseUrl = 'https://oks96yif.wuc.us.kg';
+const users = ref<User[]>([]);
 const formDate = ref({
   // id readonly
   id: 0,
   name: '',
   age: 0,
-})
+});
+
+// 驗證步驟
+const idIsPassed = (input: unknown): boolean => {
+  // No, we don't accept string, either
+  if (typeof input !== "number") {
+    return false;
+  }
+  return isNaN( input ) === false && input > 0;
+};
+const nameIsPassed = (input: unknown): boolean => {
+  if( typeof input !== "string" ) {
+    return false;
+  }
+  return input.trim() !== "";
+};
+const ageIsPassed = (input: unknown): boolean => {
+  // No, we don't accept string, either
+  if (typeof input !== "number") {
+    return false;
+  }
+  return isNaN( input ) === false && input > 0;
+};
+const formDateValidator = (input: User) => {
+  return nameIsPassed(input.name) && ageIsPassed(input.age);
+};
+
+// 確認步驟
+const confirmChoice = (input: User) => {
+  return new Promise( (resolve, reject) => {
+    const question = `確定新增 ${input.name}(${input.age}) 嗎？`;
+    const answer = window.confirm(question);
+    if( answer ) {
+      resolve(input);
+    } else {
+      reject(input);
+    }
+  });
+};
+const actionCanceled = () => {
+  alert("動作已中止。");
+  // 
+};
 
 const create = () => {
   // 需有確認步驟
-}
+  const passed = formDateValidator(formDate.value);
+  if( passed ) {
+    const confirm = confirmChoice(formDate.value);
+    confirm.then( (req) => {
+      console.log(req);
+    }).catch( actionCanceled );
+    return;
+  } else {
+    alert("請輸入姓名及年齡。");
+  }
+};
 
 const edit = () => {
+  const newLocal = idIsPassed(formDate.value.id);
   // 需有確認步驟
-}
+  const passed = formDateValidator(formDate.value) && newLocal;
+  if( passed ) {
+    const confirm = confirmChoice(formDate.value);
+    confirm.then( (req) => {
+      console.log(req);
+    }).catch( actionCanceled );
+    return;
+  } else if( formDateValidator(formDate.value) && idIsPassed(formDate.value.id) === false ) {
+    create();
+    return;
+  } else {
+    alert("請輸入姓名及年齡。");
+  }
+};
 
 
 const selectUser = (user: User) => {
@@ -90,6 +157,16 @@ const selectUser = (user: User) => {
 
 const remove = (user: User) => {
   // 需有確認步驟
+  const passed = idIsPassed(user.id);
+  if( passed ) {
+    const confirm = confirmChoice(formDate.value);
+    confirm.then( (req) => {
+      console.log(req);
+    }).catch( actionCanceled );
+    return;
+  } else {
+    alert("請求刪除的資料無效。");
+  }
 }
 
 const getUsers = () => {
@@ -97,18 +174,18 @@ const getUsers = () => {
     method: 'get',
     url: baseUrl + '/api/user',
   }).then(res => {
-    const {data} = res.data
-    users.value = data
+    const { data } = res.data;
+    users.value = data;
   }).catch(err => {
     console.log(err)
-  })
-}
+  });
+};
 
 const setupPage = () => {
-  getUsers()
-}
+  getUsers();
+};
 
-onMounted(setupPage)
+onMounted(setupPage);
 </script>
 
 <style scoped>
