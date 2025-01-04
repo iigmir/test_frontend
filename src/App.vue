@@ -145,20 +145,20 @@ const getUsers = () => {
     console.log(err)
   });
 };
-const createUser = (fillingFormDate: User) => {
+const createUser = (input: User) => {
   axios({
     method: "POST",
     url: apiPath,
     data: {
-      age: fillingFormDate.age,
-      name: fillingFormDate.name,
+      age: input.age,
+      name: input.name,
     }
   }).then( res => {
     const { data } = res.data;
     users.value.push({
       id: data.id,
-      name: fillingFormDate.name,
-      age: fillingFormDate.age
+      name: input.name,
+      age: input.age
     });
     resetFormDate();
   }).catch(err => {
@@ -166,38 +166,38 @@ const createUser = (fillingFormDate: User) => {
     console.log(err);
   });
 };
-const editUser = (fillingFormDate: User) => {
+const editUser = (input: User) => {
   axios({
     method: "PUT",
     url: apiPath,
     data: {
-      id: fillingFormDate.id,
-      age: fillingFormDate.age,
-      name: fillingFormDate.name,
+      id: input.id,
+      age: input.age,
+      name: input.name,
     }
   }).then( (res) => {
     const { data } = res.data;
-    const index = searchingItemById(fillingFormDate);
+    const index = searchingItemById(input);
     console.log(data);
     users.value[index] = {
-      id: fillingFormDate.id,
-      name: fillingFormDate.name,
-      age: fillingFormDate.age
+      id: input.id,
+      name: input.name,
+      age: input.age
     };
   }).catch( (err) => {
     alert("請求失敗！");
     console.log(err);
   });
 };
-const removeUser = (fillingFormDate: User) => {
+const removeUser = (input: User) => {
   axios({
     method: "DELETE",
     url: apiPath,
     data: {
-      id: fillingFormDate.id,
+      id: input.id,
     }
   }).then( (res) => {
-      const index = searchingItemById(fillingFormDate);
+      const index = searchingItemById(input);
       console.log(res);
       users.value.splice(index, 1);
   }).catch( (err) => {
