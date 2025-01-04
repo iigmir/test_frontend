@@ -145,7 +145,7 @@ const getUsers = () => {
     console.log(err)
   });
 };
-const createClientAction = (fillingFormDate: User) => {
+const createUser = (fillingFormDate: User) => {
   axios({
     method: "POST",
     url: apiPath,
@@ -166,7 +166,7 @@ const createClientAction = (fillingFormDate: User) => {
     console.log(err);
   });
 };
-const editClientAction = (fillingFormDate: User) => {
+const editUser = (fillingFormDate: User) => {
   axios({
     method: "PUT",
     url: apiPath,
@@ -189,7 +189,7 @@ const editClientAction = (fillingFormDate: User) => {
     console.log(err);
   });
 };
-const removeClientAction = (fillingFormDate: User) => {
+const removeUser = (fillingFormDate: User) => {
   axios({
     method: "DELETE",
     url: apiPath,
@@ -216,7 +216,7 @@ const create = () => {
       `確定新增 ${formDate.value.name}(${formDate.value.age}) 嗎？`
     );
     confirm.then( () => {
-      createClientAction(formDate.value)
+      createUser(formDate.value)
     }).catch( actionCanceled );
     return;
   }
@@ -232,7 +232,7 @@ const edit = () => {
       `確定修改 ${formDate.value.name}(${formDate.value.age}) 嗎？`
     );
     confirm.then( () => {
-      editClientAction(formDate.value);
+      editUser(formDate.value);
     }).catch( actionCanceled );
     return;
   } else if( idIsPassed(formDate.value.id) === false ) {
@@ -251,7 +251,7 @@ const remove = (user: User) => {
       "確定刪除嗎？"
     );
     confirm.then( () => {
-      removeClientAction(formDate.value);
+      removeUser(formDate.value);
     }).catch( actionCanceled );
     return;
   }
