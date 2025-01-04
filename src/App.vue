@@ -134,6 +134,17 @@ const actionCanceled = () => {
 
 // CRUD module: AJAX & slient render submodule
 const searchingItemById = (input: User) => users.value.findIndex( item => item.id === input.id );
+const getUsers = () => {
+  axios({
+    method: "GET",
+    url: apiPath,
+  }).then( res => {
+    const { data } = res.data;
+    users.value = data;
+  }).catch(err => {
+    console.log(err)
+  });
+};
 const createClientAction = (fillingFormDate: User) => {
   axios({
     method: "POST",
@@ -208,9 +219,8 @@ const create = () => {
       createClientAction(formDate.value)
     }).catch( actionCanceled );
     return;
-  } else {
-    alert("請輸入姓名及年齡。");
   }
+  alert("請輸入姓名及年齡。");
 };
 const edit = () => {
   const newLocal = idIsPassed(formDate.value.id);
@@ -226,11 +236,11 @@ const edit = () => {
     }).catch( actionCanceled );
     return;
   } else if( idIsPassed(formDate.value.id) === false ) {
+    // The user clicks the wrong button so id is invalid. Help them anyway.
     create();
     return;
-  } else {
-    alert("請輸入姓名及年齡。");
   }
+  alert("請輸入姓名及年齡。");
 };
 const remove = (user: User) => {
   // 需有確認步驟
@@ -244,26 +254,14 @@ const remove = (user: User) => {
       removeClientAction(formDate.value);
     }).catch( actionCanceled );
     return;
-  } else {
-    alert("請求刪除的資料無效。");
   }
+  alert("請求刪除的資料無效。");
 };
 
 // Rendering module
 const selectUser = (user: User) => {
   // 禁止使用 formDate.value = user
   setFormDate(user);
-};
-const getUsers = () => {
-  axios({
-    method: "GET",
-    url: apiPath,
-  }).then( res => {
-    const { data } = res.data;
-    users.value = data;
-  }).catch(err => {
-    console.log(err)
-  });
 };
 const setupPage = () => {
   getUsers();
