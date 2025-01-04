@@ -60,14 +60,12 @@ import axios from "axios";
 import { onMounted, ref } from "vue";
 import BFormControls from "./components/BFormControls.vue";
 
+// User module
 interface User {
   id: number;
   name: string;
   age: number;
 }
-
-// 由面試官提供
-const baseUrl = 'https://oks96yif.wuc.us.kg';
 const users = ref<User[]>([]);
 const formDate = ref({
   // id readonly
@@ -75,6 +73,24 @@ const formDate = ref({
   name: '',
   age: 0,
 });
+const setFormDate = (user: User) => {
+  // 禁止使用 formDate.value = user
+  formDate.value.id = user.id;
+  formDate.value.name = user.name;
+  formDate.value.age = user.age;
+};
+const resetFormDate = () => {
+  // 禁止使用 formDate.value = user
+  setFormDate({
+    id: 0,
+    name: "",
+    age: 0
+  });
+}
+
+// API動作
+const baseUrl = 'https://oks96yif.wuc.us.kg'; // 由面試官提供
+const apiPath = `${baseUrl}/api/user`;
 
 // 驗證步驟
 const idIsPassed = (input: unknown): boolean => {
@@ -102,9 +118,8 @@ const formDateValidator = (input: User) => {
 };
 
 // 確認步驟
-const confirmChoice = (input: User) => {
+const confirmChoice = (input: User, question = "") => {
   return new Promise( (resolve, reject) => {
-    const question = `確定新增 ${input.name}(${input.age}) 嗎？`;
     const answer = window.confirm(question);
     if( answer ) {
       resolve(input);
@@ -115,16 +130,31 @@ const confirmChoice = (input: User) => {
 };
 const actionCanceled = () => {
   alert("動作已中止。");
-  // 
 };
 
 const create = () => {
   // 需有確認步驟
   const passed = formDateValidator(formDate.value);
   if( passed ) {
-    const confirm = confirmChoice(formDate.value);
-    confirm.then( (req) => {
-      console.log(req);
+    const confirm = confirmChoice(
+      formDate.value,
+      `確定新增 ${formDate.value.name}(${formDate.value.age}) 嗎？`
+    );
+    confirm.then( () => {
+      axios({
+        method: "POST",
+        url: apiPath,
+        data: {
+          age: formDate.value.age,
+          name: formDate.value.name,
+        }
+      }).then( res => {
+        const { data } = res.data;
+        resetFormDate();
+        console.log( data );
+      }).catch(err => {
+        console.log(err)
+      });
     }).catch( actionCanceled );
     return;
   } else {
@@ -137,12 +167,15 @@ const edit = () => {
   // 需有確認步驟
   const passed = formDateValidator(formDate.value) && newLocal;
   if( passed ) {
-    const confirm = confirmChoice(formDate.value);
+    const confirm = confirmChoice(
+      formDate.value, 
+      `確定修改 ${formDate.value.name}(${formDate.value.age}) 嗎？`
+    );
     confirm.then( (req) => {
       console.log(req);
     }).catch( actionCanceled );
     return;
-  } else if( formDateValidator(formDate.value) && idIsPassed(formDate.value.id) === false ) {
+  } else if( idIsPassed(formDate.value.id) === false ) {
     create();
     return;
   } else {
@@ -153,13 +186,17 @@ const edit = () => {
 
 const selectUser = (user: User) => {
   // 禁止使用 formDate.value = user
+  setFormDate(user);
 }
 
 const remove = (user: User) => {
   // 需有確認步驟
   const passed = idIsPassed(user.id);
   if( passed ) {
-    const confirm = confirmChoice(formDate.value);
+    const confirm = confirmChoice(
+      formDate.value,
+      "確定刪除嗎？"
+    );
     confirm.then( (req) => {
       console.log(req);
     }).catch( actionCanceled );
@@ -171,9 +208,9 @@ const remove = (user: User) => {
 
 const getUsers = () => {
   axios({
-    method: 'get',
-    url: baseUrl + '/api/user',
-  }).then(res => {
+    method: "GET",
+    url: apiPath,
+  }).then( res => {
     const { data } = res.data;
     users.value = data;
   }).catch(err => {
