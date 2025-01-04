@@ -102,7 +102,6 @@ const getUsers = () => {
   }).catch(err => {
     console.log(err)
   })
-
 }
 
 const setupPage = () => {
