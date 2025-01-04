@@ -32,7 +32,7 @@ const props = defineProps<{
   /**
    * We don't really know what will sent from parents, so...
    */
-  modelValue: [Boolean, Number, String],
+  modelValue: boolean | number | string,
 }>();
 /**
  * @see: [Component v-model](https://vuejs.org/guide/components/v-model)
@@ -41,7 +41,8 @@ const emits = defineEmits([
   "update:modelValue"
 ]);
 /**
- * @see [HTML input types](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types)
+ * Default to "text" if no type is provided.
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#input_types
  */
 const input_type = computed( () => props.type ?? "text" );
 
@@ -54,13 +55,19 @@ const input_type = computed( () => props.type ?? "text" );
  */
 const emit_model = (e: Event) => {
   const source_value = (e.target as HTMLInputElement).value;
-  const get_emitted_value = (source_value = "", input_type = "text") => {
+  /**
+   * Convert the input value based on the input type.
+   * @param input - The raw value from the input element.
+   * @param input_type - The input type (e.g., "number", "checkbox").
+   * @returns The parsed value.
+  */
+  const get_emitted_value = (input = "", input_type = "text") => {
     switch (input_type) {
       // Special cases
-      case "number": return parseInt(source_value, 10);
-      case "checkbox": return Boolean(source_value);
+      case "number": return parseInt(input, 10);
+      case "checkbox": return Boolean(input);
       // In general cases we just return the value as-is
-      default: return source_value;
+      default: return input;
     }
   };
   /**
@@ -72,6 +79,10 @@ const emit_model = (e: Event) => {
 
 // Element ID module
 const uuid_id = ref("");
+/**
+ * Generate a unique element ID. Ensures no duplicate IDs in the page.
+ * @param input - An initial value for the UUID generation.
+ */
 const generate_uuid_id = (input = "") => {
   // If has element, generate uuid again
   if( document.querySelector(`#label-${input}`) != null ) {
@@ -80,6 +91,7 @@ const generate_uuid_id = (input = "") => {
   return input;
 };
 uuid_id.value = generate_uuid_id( get_uuid() );
+
 const element_id = computed( () => `label-${uuid_id.value}` );
 </script>
 
