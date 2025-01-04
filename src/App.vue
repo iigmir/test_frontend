@@ -134,6 +134,7 @@ const actionCanceled = () => {
 
 // Client side CRUD module
 // Methods there must execute AFTER finishing methods at server side CRUD module
+const searchingItemById = (input: User) => users.value.findIndex( item => item.id === input.id );
 const createClientAction = ({ data } = { data: { id: 0 } }, fillingFormDate: User) => {
   users.value.push({
     id: data.id,
@@ -142,6 +143,16 @@ const createClientAction = ({ data } = { data: { id: 0 } }, fillingFormDate: Use
   });
   resetFormDate();
 };
+const editClientAction = ({ data } = { data: { id: 0 } }, fillingFormDate: User) => {
+  const index = searchingItemById(fillingFormDate);
+  console.log(data);
+  users.value[index] = {
+    id: fillingFormDate.id,
+    name: fillingFormDate.name,
+    age: fillingFormDate.age
+  };
+};
+const removeClientAction = () => {};
 
 // Server side CRUD module
 const create = () => {
@@ -163,7 +174,8 @@ const create = () => {
       }).then( res => {
         createClientAction(res.data, formDate.value)
       }).catch(err => {
-        console.log(err)
+        alert("請求失敗！");
+        console.log(err);
       });
     }).catch( actionCanceled );
     return;
@@ -171,7 +183,6 @@ const create = () => {
     alert("請輸入姓名及年齡。");
   }
 };
-
 const edit = () => {
   const newLocal = idIsPassed(formDate.value.id);
   // 需有確認步驟
@@ -182,6 +193,20 @@ const edit = () => {
       `確定修改 ${formDate.value.name}(${formDate.value.age}) 嗎？`
     );
     confirm.then( (req) => {
+      axios({
+        method: "PUT",
+        url: apiPath,
+        data: {
+          id: formDate.value.id,
+          age: formDate.value.age,
+          name: formDate.value.name,
+        }
+      }).then( (res) => {
+        editClientAction(res.data, formDate.value)
+      }).catch( (err) => {
+        alert("請求失敗！");
+        console.log(err);
+      });
       console.log(req);
     }).catch( actionCanceled );
     return;
@@ -192,13 +217,6 @@ const edit = () => {
     alert("請輸入姓名及年齡。");
   }
 };
-
-
-const selectUser = (user: User) => {
-  // 禁止使用 formDate.value = user
-  setFormDate(user);
-}
-
 const remove = (user: User) => {
   // 需有確認步驟
   const passed = idIsPassed(user.id);
@@ -209,12 +227,18 @@ const remove = (user: User) => {
     );
     confirm.then( (req) => {
       console.log(req);
+      removeClientAction();
     }).catch( actionCanceled );
     return;
   } else {
     alert("請求刪除的資料無效。");
   }
-}
+};
+
+const selectUser = (user: User) => {
+  // 禁止使用 formDate.value = user
+  setFormDate(user);
+};
 
 const getUsers = () => {
   axios({
