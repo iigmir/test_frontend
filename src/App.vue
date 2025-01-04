@@ -66,7 +66,7 @@ interface User {
   age: number;
 }
 
-const baseUrl = '' // 由面試官提供
+const baseUrl = 'https://oks96yif.wuc.us.kg' // 由面試官提供
 const users = ref<User[]>([])
 const formDate = ref({
   // id readonly
