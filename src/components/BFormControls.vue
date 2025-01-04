@@ -6,7 +6,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { ref, computed } from "vue";
+import { get_uuid } from "../assets/utils";
 
 const props = defineProps({
   label: String,
@@ -14,7 +15,19 @@ const props = defineProps({
 });
 
 const type_to_bind = computed( () => props.type ?? "text" );
-const id_bind = computed( () => `label-${props.label}-${type_to_bind.value}` );
+
+// Element ID module
+const uuid_id = ref("");
+const generate_uuid_id = (input = "") => {
+  // If has element, generate uuid again
+  if( document.querySelector(`#label-${input}`) != null ) {
+    return generate_uuid_id(get_uuid());
+  }
+  return input;
+};
+uuid_id.value = generate_uuid_id( get_uuid() );
+
+const id_bind = computed( () => `label-${uuid_id.value}` );
 </script>
 
 <style lang="scss" scoped>
