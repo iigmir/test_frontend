@@ -132,6 +132,18 @@ const actionCanceled = () => {
   alert("動作已中止。");
 };
 
+// Client side CRUD module
+// Methods there must execute AFTER finishing methods at server side CRUD module
+const createClientAction = ({ data } = { data: { id: 0 } }, fillingFormDate: User) => {
+  users.value.push({
+    id: data.id,
+    name: fillingFormDate.name,
+    age: fillingFormDate.age
+  });
+  resetFormDate();
+};
+
+// Server side CRUD module
 const create = () => {
   // 需有確認步驟
   const passed = formDateValidator(formDate.value);
@@ -149,9 +161,7 @@ const create = () => {
           name: formDate.value.name,
         }
       }).then( res => {
-        const { data } = res.data;
-        resetFormDate();
-        console.log( data );
+        createClientAction(res.data, formDate.value)
       }).catch(err => {
         console.log(err)
       });
