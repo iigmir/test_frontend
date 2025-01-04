@@ -132,29 +132,55 @@ const actionCanceled = () => {
   alert("動作已中止。");
 };
 
-// Client side CRUD module
-// Methods there must execute AFTER finishing methods at server side CRUD module
+// CRUD module: AJAX & slient render submodule
 const searchingItemById = (input: User) => users.value.findIndex( item => item.id === input.id );
-const createClientAction = ({ data } = { data: { id: 0 } }, fillingFormDate: User) => {
-  users.value.push({
-    id: data.id,
-    name: fillingFormDate.name,
-    age: fillingFormDate.age
+const createClientAction = (fillingFormDate: User) => {
+  axios({
+    method: "POST",
+    url: apiPath,
+    data: {
+      age: formDate.value.age,
+      name: formDate.value.name,
+    }
+  }).then( res => {
+    const { data } = res.data;
+    users.value.push({
+      id: data.id,
+      name: fillingFormDate.name,
+      age: fillingFormDate.age
+    });
+    resetFormDate();
+  }).catch(err => {
+    alert("請求失敗！");
+    console.log(err);
   });
-  resetFormDate();
 };
-const editClientAction = ({ data } = { data: { id: 0 } }, fillingFormDate: User) => {
-  const index = searchingItemById(fillingFormDate);
-  console.log(data);
-  users.value[index] = {
-    id: fillingFormDate.id,
-    name: fillingFormDate.name,
-    age: fillingFormDate.age
-  };
+const editClientAction = (fillingFormDate: User) => {
+  axios({
+    method: "PUT",
+    url: apiPath,
+    data: {
+      id: formDate.value.id,
+      age: formDate.value.age,
+      name: formDate.value.name,
+    }
+  }).then( (res) => {
+    const { data } = res.data;
+    const index = searchingItemById(fillingFormDate);
+    console.log(data);
+    users.value[index] = {
+      id: fillingFormDate.id,
+      name: fillingFormDate.name,
+      age: fillingFormDate.age
+    };
+  }).catch( (err) => {
+    alert("請求失敗！");
+    console.log(err);
+  });
 };
 const removeClientAction = () => {};
 
-// Server side CRUD module
+// CRUD module: Confirmation submodule
 const create = () => {
   // 需有確認步驟
   const passed = formDateValidator(formDate.value);
@@ -164,19 +190,7 @@ const create = () => {
       `確定新增 ${formDate.value.name}(${formDate.value.age}) 嗎？`
     );
     confirm.then( () => {
-      axios({
-        method: "POST",
-        url: apiPath,
-        data: {
-          age: formDate.value.age,
-          name: formDate.value.name,
-        }
-      }).then( res => {
-        createClientAction(res.data, formDate.value)
-      }).catch(err => {
-        alert("請求失敗！");
-        console.log(err);
-      });
+      createClientAction(formDate.value)
     }).catch( actionCanceled );
     return;
   } else {
@@ -192,22 +206,8 @@ const edit = () => {
       formDate.value, 
       `確定修改 ${formDate.value.name}(${formDate.value.age}) 嗎？`
     );
-    confirm.then( (req) => {
-      axios({
-        method: "PUT",
-        url: apiPath,
-        data: {
-          id: formDate.value.id,
-          age: formDate.value.age,
-          name: formDate.value.name,
-        }
-      }).then( (res) => {
-        editClientAction(res.data, formDate.value)
-      }).catch( (err) => {
-        alert("請求失敗！");
-        console.log(err);
-      });
-      console.log(req);
+    confirm.then( () => {
+      editClientAction(formDate.value);
     }).catch( actionCanceled );
     return;
   } else if( idIsPassed(formDate.value.id) === false ) {
@@ -235,11 +235,11 @@ const remove = (user: User) => {
   }
 };
 
+// Rendering module
 const selectUser = (user: User) => {
   // 禁止使用 formDate.value = user
   setFormDate(user);
 };
-
 const getUsers = () => {
   axios({
     method: "GET",
@@ -251,11 +251,9 @@ const getUsers = () => {
     console.log(err)
   });
 };
-
 const setupPage = () => {
   getUsers();
 };
-
 onMounted(setupPage);
 </script>
 
