@@ -26,14 +26,14 @@ import { get_uuid } from "../assets/utils";
  * Why we use such a scrawl: 
  * [Type-only props/emit declarations](https://vuejs.org/api/sfc-script-setup.html#type-only-props-emit-declarations)
  */
-const props = defineProps<{
-  label: string,
-  type: string,
+const props = defineProps({
+  label: String,
+  type: String,
   /**
    * We don't really know what will sent from parents, so...
    */
-  modelValue: boolean | number | string,
-}>();
+  modelValue: [Number, String],
+});
 /**
  * @see: [Component v-model](https://vuejs.org/guide/components/v-model)
  */
