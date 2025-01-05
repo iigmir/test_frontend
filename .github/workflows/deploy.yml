@@ -27,9 +27,5 @@ jobs:
         env:
           MY_EMAIL: iigmir@gmail.com
           MY_NAME: iigmir
-        run: |
-          git config --global user.email $MY_EMAIL
-          git config --global user.name $MY_NAME
-          git remote set-url origin $MY_NAME:${{ secrets.MY_PASSWORD }}@github.com:iigmir/test_frontend.git
-          npm run build
-          gh-pages -d docs -u ${MY_NAME} <${MY_EMAIL}>
+        # https://github.com/tschaub/gh-pages/issues/359
+        run:  git config --global user.email $MY_EMAIL && git config --global user.name $MY_NAME && git remote set-url origin $MY_NAME:${{ secrets.MY_PASSWORD }}@github.com:iigmir/test_frontend.git && npm run build && gh-pages -d docs -u ${MY_NAME} <${MY_EMAIL}>
