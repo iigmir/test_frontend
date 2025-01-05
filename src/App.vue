@@ -88,11 +88,11 @@ const resetFormDate = () => {
   });
 }
 
-// API動作
+// API module - API動作
 const baseUrl = 'https://oks96yif.wuc.us.kg'; // 由面試官提供
 const apiPath = `${baseUrl}/api/user`;
 
-// 驗證步驟
+// Validator module - 驗證步驟
 const idIsPassed = (input: unknown): boolean => {
   // No, we don't accept string, either
   if (typeof input !== "number") {
@@ -117,7 +117,7 @@ const formDateValidator = (input: User) => {
   return nameIsPassed(input.name) && ageIsPassed(input.age);
 };
 
-// 確認步驟
+// Confirmation module - 確認步驟
 const confirmChoice = (input: User, question = "") => {
   return new Promise( (resolve, reject) => {
     const answer = window.confirm(question);
@@ -132,8 +132,10 @@ const actionCanceled = () => {
   alert("動作已中止。");
 };
 
-// CRUD module: AJAX & slient render submodule
-const searchingItemById = (input: User) => users.value.findIndex( item => item.id === input.id );
+// CRUD module: AJAX & slient render submodule - 後端交互
+const searchingItemById = (input: User) => {
+  return users.value.findIndex( item => item.id === input.id );
+};
 const getUsers = () => {
   axios({
     method: "GET",
@@ -206,7 +208,7 @@ const removeUser = (input: User) => {
   });
 };
 
-// CRUD module: Confirmation submodule
+// CRUD module: Confirmation submodule - 前端互動
 const create = () => {
   // 需有確認步驟
   const passed = formDateValidator(formDate.value);
@@ -258,7 +260,7 @@ const remove = (user: User) => {
   alert("請求刪除的資料無效。");
 };
 
-// Rendering module
+// Other module - 其他模塊
 const selectUser = (user: User) => {
   // 禁止使用 formDate.value = user
   setFormDate(user);
