@@ -8,6 +8,10 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    # https://github.com/tschaub/gh-pages/issues/359
+    env:
+      MY_EMAIL: iigmir@gmail.com
+      MY_NAME: iigmir
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -24,13 +28,9 @@ jobs:
         run: npm run build
 
       - name: Deploy to GitHub Pages
-        env:
-          MY_EMAIL: iigmir@gmail.com
-          MY_NAME: iigmir
-        # https://github.com/tschaub/gh-pages/issues/359
         run: |
           git config --global user.email $MY_EMAIL
           git config --global user.name $MY_NAME
-          git remote set-url origin $MY_NAME:${{ secrets.MY_PASSWORD }}@github.com:iigmir/test_frontend.git
+          git remote set-url origin https://$MY_NAME:${{ secrets.MY_PASSWORD }}@github.com/$MY_NAME/test_frontend.git
           npm run build
           gh-pages -d docs -u ${MY_NAME} <${MY_EMAIL}>
