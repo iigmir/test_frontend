@@ -24,4 +24,10 @@ jobs:
         run: npm run build
 
       - name: Deploy to GitHub Pages
-        run: npm run deploy
+        env:
+          MY_EMAIL: iigmir@gmail.com
+          MY_NAME: iigmir
+        run: |
+          git config --global user.email $MY_EMAIL
+          git config --global user.name $MY_NAME
+          npm run deploy
