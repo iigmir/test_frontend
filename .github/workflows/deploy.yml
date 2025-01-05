@@ -30,4 +30,5 @@ jobs:
         run: |
           git config --global user.email $MY_EMAIL
           git config --global user.name $MY_NAME
-          npm run deploy
+          npm run build
+          gh-pages -d docs -u ${MY_NAME} <${MY_EMAIL}>
